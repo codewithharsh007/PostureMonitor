@@ -11,7 +11,9 @@ import { PostureData, defaultPostureData } from "@/types/posture";
 import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
 
-const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000";
+const WS_BASE = (
+  process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000"
+).replace(/\/$/, "");
 const CAMERA_RUNNING_KEY = "camera_was_running";
 
 interface PostureContextType {
@@ -196,7 +198,7 @@ export function PostureProvider({ children }: { children: React.ReactNode }) {
 
       const base64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
       try {
-        const result = await api.analyzeFrame({ frame: base64 }) as any;
+        const result = (await api.analyzeFrame({ frame: base64 })) as any;
         if (result?.posture_score !== undefined) {
           const postureResult = result as PostureData;
           setCameraData(postureResult);
