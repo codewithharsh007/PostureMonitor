@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.egg-info/
+
+# Next.js
+posturedectfrontend/.next/
+posturedectfrontend/node_modules/
+posturedectfrontend/.env
+posturedectfrontend/.env.local
+
+# General
+.DS_Store
+*.log
+dist/
+build/
