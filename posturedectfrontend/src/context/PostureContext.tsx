@@ -58,6 +58,13 @@ export function PostureProvider({ children }: { children: React.ReactNode }) {
     runningRef.current = running;
   }, [running]);
 
+  // wakes up Render on app load
+  useEffect(() => {
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_URL?.replace("/api/backend", "")}/health`,
+    ).catch(() => {});
+  }, []);
+
   // ── Create offscreen canvas once on mount ────────────────────
   useEffect(() => {
     if (typeof window === "undefined") return;

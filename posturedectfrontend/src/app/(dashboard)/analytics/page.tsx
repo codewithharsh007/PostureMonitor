@@ -16,21 +16,36 @@ import {
   Bar,
 } from "recharts";
 
+// ── Helpers ───────────────────────────────────────────────────────
+function formatMins(mins: number): string {
+  if (mins >= 60) {
+    const h = Math.floor(mins / 60);
+    const m = Math.round(mins % 60);
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+  return `${Math.round(mins)}m`;
+}
+
+// Convert raw frame count → minutes (each frame = 0.5s)
+function framesToMins(frames: number): number {
+  return Math.round(((frames * 0.5) / 60) * 10) / 10;
+}
+
 export default function AnalyticsPage() {
   const { report, loading, error } = usePostureHistory();
   const { liveData } = usePosture();
 
-  // ── Use report.days — NOT sessions ───────────────────────────
   const days = report.days ?? [];
 
   const chartData = days.map((d) => ({
     date: formatDate(d.date),
     score: d.avg_score,
     badMins: d.bad_duration_mins,
-    neck: d.neck_issues,
-    spine: d.spine_issues,
-    lean: d.leaning_issues,
-    tilt: d.tilt_issues,
+    // Convert frame counts → minutes for meaningful display
+    neck: framesToMins(d.neck_issues),
+    spine: framesToMins(d.spine_issues),
+    lean: framesToMins(d.leaning_issues),
+    tilt: framesToMins(d.tilt_issues),
   }));
 
   const summary = report.summary;
@@ -68,8 +83,8 @@ export default function AnalyticsPage() {
               bg: summary.trend === "improving" ? "bg-green-50" : "bg-red-50",
             },
             {
-              label: "Total Bad Mins",
-              value: `${summary.total_bad_mins}m`,
+              label: "Total Bad Posture",
+              value: formatMins(summary.total_bad_mins),
               icon: Clock,
               color: "text-orange-500",
               bg: "bg-orange-50",
@@ -185,22 +200,29 @@ export default function AnalyticsPage() {
                     border: "none",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                   }}
+                  formatter={(val: number) => [
+                    `${formatMins(val)}`,
+                    "Bad Posture",
+                  ]}
                 />
                 <Bar
                   dataKey="badMins"
                   fill="#f97316"
                   radius={[6, 6, 0, 0]}
-                  name="Bad Posture (min)"
+                  name="Bad Posture"
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Issues breakdown */}
+          {/* Issues breakdown — shown in minutes now */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="text-base font-semibold text-gray-800 mb-4">
+            <h2 className="text-base font-semibold text-gray-800 mb-1">
               Issue Breakdown — Last 7 Days
             </h2>
+            <p className="text-xs text-gray-400 mb-4">
+              Time spent with each issue (minutes)
+            </p>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -208,13 +230,14 @@ export default function AnalyticsPage() {
                   dataKey="date"
                   tick={{ fontSize: 11, fill: "#9ca3af" }}
                 />
-                <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} />
+                <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} unit="m" />
                 <Tooltip
                   contentStyle={{
                     borderRadius: "12px",
                     border: "none",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                   }}
+                  formatter={(val: number) => [`${val}m`]}
                 />
                 <Bar
                   dataKey="neck"
@@ -255,7 +278,7 @@ export default function AnalyticsPage() {
                   <tr className="text-xs text-gray-400 border-b border-gray-100">
                     <th className="text-left py-2 font-medium">Date</th>
                     <th className="text-right py-2 font-medium">Avg Score</th>
-                    <th className="text-right py-2 font-medium">Bad Mins</th>
+                    <th className="text-right py-2 font-medium">Bad Time</th>
                     <th className="text-right py-2 font-medium">Neck</th>
                     <th className="text-right py-2 font-medium">Spine</th>
                     <th className="text-right py-2 font-medium">Lean</th>
@@ -284,20 +307,22 @@ export default function AnalyticsPage() {
                       >
                         {d.avg_score}
                       </td>
+                      {/* ✅ Show formatted time instead of raw mins */}
                       <td className="py-2.5 text-right text-orange-500">
-                        {d.bad_duration_mins}m
+                        {formatMins(d.bad_duration_mins)}
                       </td>
+                      {/* ✅ Show minutes instead of raw frame counts */}
                       <td className="py-2.5 text-right text-indigo-400">
-                        {d.neck_issues}
+                        {framesToMins(d.neck_issues)}m
                       </td>
                       <td className="py-2.5 text-right text-red-400">
-                        {d.spine_issues}
+                        {framesToMins(d.spine_issues)}m
                       </td>
                       <td className="py-2.5 text-right text-orange-400">
-                        {d.leaning_issues}
+                        {framesToMins(d.leaning_issues)}m
                       </td>
                       <td className="py-2.5 text-right text-yellow-500">
-                        {d.tilt_issues}
+                        {framesToMins(d.tilt_issues)}m
                       </td>
                     </tr>
                   ))}

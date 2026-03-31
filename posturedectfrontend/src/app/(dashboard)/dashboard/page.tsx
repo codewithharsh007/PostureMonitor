@@ -44,9 +44,12 @@ export default function DashboardPage() {
 
   // Build timeline chart data
   const timelineData = todayLogs.slice(-60).map((l) => ({
-    time: new Date(l.created_at).toLocaleTimeString("en-IN", {
+    time: new Date(
+      l.created_at.endsWith("Z") ? l.created_at : l.created_at + "Z", // ← ensure UTC parse
+    ).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: true,
     }),
     score: l.posture_score,
   }));

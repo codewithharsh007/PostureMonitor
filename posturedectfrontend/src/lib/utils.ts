@@ -1,16 +1,11 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// cn() merges Tailwind classes safely — resolves conflicts like
-// "px-2 px-4" → "px-4" instead of keeping both
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 // ── Posture Score Helpers ─────────────────────────────────────────
-// Used across dashboard, camera, analytics for consistent color coding
-// Good ≥ 80 (green) | Warning ≥ 65 (orange) | Bad < 65 (red)
-
 export function getScoreColor(score: number): string {
   if (score >= 80) return "text-green-500";
   if (score >= 65) return "text-orange-500";
@@ -50,8 +45,23 @@ export function formatDuration(seconds: number): string {
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
 }
 
+// ✅ Handles both "YYYY-MM-DD" and full ISO strings correctly
 export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-IN", {
+  if (!iso) return "";
+
+  // If it's a date-only string "YYYY-MM-DD" — parse manually to avoid timezone shift
+  if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+    const [year, month, day] = iso.split("-").map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  // Full ISO string "2026-03-31T10:25:00Z" — append Z if missing then parse
+  const normalized = iso.endsWith("Z") ? iso : iso + "Z";
+  return new Date(normalized).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -59,14 +69,18 @@ export function formatDate(iso: string): string {
 }
 
 export function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-IN", {
+  if (!iso) return "";
+  const normalized = iso.endsWith("Z") ? iso : iso + "Z";
+  return new Date(normalized).toLocaleTimeString("en-IN", {
     hour: "2-digit",
     minute: "2-digit",
   });
 }
 
 export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("en-IN", {
+  if (!iso) return "";
+  const normalized = iso.endsWith("Z") ? iso : iso + "Z";
+  return new Date(normalized).toLocaleString("en-IN", {
     day: "numeric",
     month: "short",
     hour: "2-digit",
@@ -75,7 +89,9 @@ export function formatDateTime(iso: string): string {
 }
 
 export function timeAgo(iso: string): string {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (!iso) return "";
+  const normalized = iso.endsWith("Z") ? iso : iso + "Z";
+  const diff = Math.floor((Date.now() - new Date(normalized).getTime()) / 1000);
   if (diff < 60) return "just now";
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
@@ -83,8 +99,6 @@ export function timeAgo(iso: string): string {
 }
 
 // ── Issue Label Helpers ───────────────────────────────────────────
-// Returns human-readable label for each posture issue
-
 export function getIssueLabel(
   key: "neck_bad" | "spine_bad" | "leaning" | "head_tilt",
   direction?: string | null,
@@ -104,7 +118,6 @@ export function getIssueLabel(
 }
 
 // ── Score Percentage for circular progress ────────────────────────
-// Maps 0–100 score to a CSS conic-gradient percentage string
 export function scoreToGradient(score: number): string {
   const pct = Math.max(0, Math.min(100, score));
   const hex = getScoreHex(score);
