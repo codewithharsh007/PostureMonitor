@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { api } from "@/lib/api";
-import { saveUser } from "@/lib/auth";
+import { saveUser, AuthUser } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function LoginPage() {
         username: form.username,
         password: form.password,
       });
-      saveUser(user);
+      saveUser(user as AuthUser);
       router.replace("/dashboard");
     } catch (err: any) {
       setError(err.message || "Login failed");
