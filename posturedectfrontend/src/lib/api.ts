@@ -1,7 +1,6 @@
 import { getToken } from "./auth";
 
-const BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/backend";
+const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function req<T = unknown>(
   path: string,
