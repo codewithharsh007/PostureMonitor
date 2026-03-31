@@ -200,8 +200,8 @@ export default function AnalyticsPage() {
                     border: "none",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                   }}
-                  formatter={(val: number) => [
-                    `${formatMins(val)}`,
+                  formatter={(val: any) => [
+                    `${formatMins(val as number)}`,
                     "Bad Posture",
                   ]}
                 />
@@ -237,7 +237,7 @@ export default function AnalyticsPage() {
                     border: "none",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                   }}
-                  formatter={(val: number) => [`${val}m`]}
+                  formatter={(val: any) => [`${val}m`]}
                 />
                 <Bar
                   dataKey="neck"

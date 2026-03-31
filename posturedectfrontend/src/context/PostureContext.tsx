@@ -183,8 +183,8 @@ export function PostureProvider({ children }: { children: React.ReactNode }) {
         if (!track || track.readyState !== "live") return;
         try {
           // @ts-ignore — ImageCapture is not in all TS types
-          const imageCapture = new ImageCapture(track);
-          const bitmap = await imageCapture.grabFrame();
+          const imageCapture = new (window as any).ImageCapture(track);
+          const bitmap = await (imageCapture as any).grabFrame();
           canvas.width = bitmap.width;
           canvas.height = bitmap.height;
           ctx.drawImage(bitmap, 0, 0);
@@ -196,7 +196,7 @@ export function PostureProvider({ children }: { children: React.ReactNode }) {
 
       const base64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
       try {
-        const result = await api.analyzeFrame({ frame: base64 });
+        const result = await api.analyzeFrame({ frame: base64 }) as any;
         if (result?.posture_score !== undefined) {
           const postureResult = result as PostureData;
           setCameraData(postureResult);

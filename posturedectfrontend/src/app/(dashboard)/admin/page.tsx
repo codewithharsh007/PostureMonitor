@@ -21,7 +21,7 @@ export default function AdminPage() {
     Promise.all([api.adminStats(), api.adminUsers()])
       .then(([s, u]) => {
         setStats(s);
-        setUsers(u);
+        setUsers(u as any[]);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

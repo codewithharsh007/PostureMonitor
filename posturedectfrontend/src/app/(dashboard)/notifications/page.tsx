@@ -85,7 +85,7 @@ export default function NotificationsPage() {
     setLoadingDb(true);
     try {
       const data = await api.notifications();
-      const mapped: DBNotification[] = data.map((n: any) => ({
+      const mapped: DBNotification[] = (data as any[]).map((n: any) => ({
         id: n.id,
         type: n.type as "warning" | "success" | "info",
         title: n.title,
