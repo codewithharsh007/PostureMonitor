@@ -108,7 +108,10 @@ app = FastAPI(title="Posture Mentor API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with your Vercel URL in production
+    allow_origins=[
+        "https://posture-dectector.vercel.app",
+        "http://localhost:3000",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
