@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { api } from "@/lib/api";
 import { saveUser, AuthUser } from "@/lib/auth";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,10 +38,16 @@ export default function LoginPage() {
       style={{ backgroundColor: "#f5f0eb" }}
     >
       <div className="bg-white rounded-2xl shadow-sm p-10 w-full max-w-md">
-        <div className="flex items-center gap-2 mb-8">
-          <div className="w-9 h-9 bg-green-500 rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-sm">P</span>
-          </div>
+        {/* Logo */}
+        <div className="flex items-center gap-2 mb-3 -ml-2.5">
+          <Image
+            src="/logo.png"
+            alt="Posture Monitor"
+            width={36}
+            height={36}
+            className="rounded-lg w-auto h-auto"
+            priority
+          />
           <span className="text-xl font-bold text-gray-800">
             Posture Monitor
           </span>
