@@ -109,7 +109,7 @@ app = FastAPI(title="Posture Mentor API", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://posture-dectector.vercel.app",
+        "https://posturemonitor.vercel.app",
         "http://localhost:3000",
     ],
     allow_methods=["*"],
